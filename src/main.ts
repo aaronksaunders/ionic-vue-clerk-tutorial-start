@@ -58,12 +58,22 @@ import "@ionic/vue/css/flex-utils.css";
 
 /* Theme variables */
 import "./theme/variables.css";
+import { clerkPlugin } from "@clerk/vue";
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
+}
 
 const app = createApp(App)
   .use(IonicVue, {
     mode: "ios",
   })
-  .use(router);
+  .use(router)
+  .use(clerkPlugin, {
+    publishableKey: PUBLISHABLE_KEY,
+  });
 
 // Wait for router to be ready before mounting
 router.isReady().then(() => {

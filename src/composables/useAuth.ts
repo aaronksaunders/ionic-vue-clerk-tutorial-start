@@ -1,8 +1,8 @@
 /**
- * @fileoverview Mock authentication composable for tutorial purposes
+ * @fileoverview Authentication composable for tutorial starting point
  *
- * This composable provides mock authentication functionality to replace Clerk
- * during the tutorial. It simulates login, signup, and logout operations.
+ * This is a simple template that simulates authentication state and methods.
+ * It will be completely replaced with real Clerk functionality during the tutorial.
  *
  * @author Aaron Saunders
  * @version 1.0.0
@@ -12,9 +12,9 @@
 import { ref, computed } from "vue";
 
 /**
- * Mock user interface
+ * User interface
  */
-interface MockUser {
+interface User {
   id: string;
   email: string;
   firstName: string;
@@ -23,114 +23,85 @@ interface MockUser {
 }
 
 /**
- * Mock authentication state
+ * Authentication state
  */
+const isLoading = ref(false);
 const isLoaded = ref(true);
 const isSignedIn = ref(false);
-const user = ref<MockUser | null>(null);
+const user = ref<User | null>(null);
+const error = ref("");
 
 /**
- * Mock authentication composable
- * @returns Authentication state and methods
+ * Authentication composable
+ *
+ * This provides a simple interface that matches what we'll build with Clerk.
+ * All methods are templates and will be replaced during the tutorial.
  */
 export function useAuth() {
   /**
-   * Mock sign in function
-   * @param email - User email
-   * @param password - User password
-   * @returns Promise that resolves to sign in result
+   * Sign in - always fails for demo purposes
    */
-  const signIn = async (email: string, password: string) => {
-    // Simulate API delay
+  const signIn = async (email: string, password: string): Promise<boolean> => {
+    isLoading.value = true;
+    error.value = "";
+
+    // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Mock successful sign in
-    if (email && password) {
-      isSignedIn.value = true;
-      user.value = {
-        id: "mock-user-1",
-        email,
-        firstName: "John",
-        lastName: "Doe",
-        imageUrl: "https://via.placeholder.com/150",
-      };
-      return { status: "complete" };
-    }
-
-    throw new Error("Invalid credentials");
+    // Always fail to encourage using real Clerk
+    error.value = "Authentication - please integrate Clerk to enable sign in";
+    isLoading.value = false;
+    return false;
   };
 
   /**
-   * Mock sign up function
-   * @param email - User email
-   * @param password - User password
-   * @param firstName - User first name
-   * @param lastName - User last name
-   * @returns Promise that resolves to sign up result
+   * Sign up - always fails for demo purposes
    */
   const signUp = async (
     email: string,
     password: string,
     firstName: string,
     lastName: string
-  ) => {
-    // Simulate API delay
+  ): Promise<boolean> => {
+    isLoading.value = true;
+    error.value = "";
+
+    // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Mock successful sign up
-    if (email && password && firstName && lastName) {
-      // Simulate email verification requirement
-      if (email.includes("verify")) {
-        // User needs to verify email
-        return { status: "missing_requirements" };
-      }
-
-      // Mock successful sign up after verification
-      isSignedIn.value = true;
-      user.value = {
-        id: "mock-user-1",
-        email,
-        firstName,
-        lastName,
-        imageUrl: "https://via.placeholder.com/150",
-      };
-      return { status: "complete" };
-    }
-
-    throw new Error("Invalid sign up data");
+    // Always fail to encourage using real Clerk
+    error.value = "Authentication - please integrate Clerk to enable sign up";
+    isLoading.value = false;
+    return false;
   };
 
   /**
-   * Mock sign out function
-   * @returns Promise that resolves when sign out is complete
+   * Sign out - resets state
    */
-  const signOut = async () => {
-    // Simulate API delay
+  const signOut = async (): Promise<void> => {
+    isLoading.value = true;
+
+    // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    // Reset state
     isSignedIn.value = false;
     user.value = null;
-  };
-
-  /**
-   * Mock refresh function
-   * @returns Promise that resolves when refresh is complete
-   */
-  const refresh = async () => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // In a real app, this would refresh the user session
-    return { status: "complete" };
+    error.value = "";
+    isLoading.value = false;
   };
 
   return {
-    isLoaded: computed(() => isLoaded.value),
+    // State
     isSignedIn: computed(() => isSignedIn.value),
     user: computed(() => user.value),
+    isLoaded: computed(() => isLoaded.value),
+    isLoading: computed(() => isLoading.value),
+    error: computed(() => error.value),
+
+    // Methods
     signIn,
     signUp,
     signOut,
-    refresh,
   };
 }

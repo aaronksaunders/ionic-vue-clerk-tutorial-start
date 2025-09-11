@@ -109,7 +109,7 @@ import {
 import { useAuth } from "../composables/useAuth";
 
 const router = useRouter();
-const { signIn } = useAuth();
+const { handleSignIn: signIn } = useAuth();
 
 // Form state
 const email = ref("");

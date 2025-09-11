@@ -44,12 +44,18 @@ A basic Ionic Vue application with mock authentication, designed as a starting p
    npm install
    ```
 
-2. **Run the development server**
+2. **Set up environment variables (for Clerk integration)**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Clerk publishable key when ready to integrate
+   ```
+
+3. **Run the development server**
    ```bash
    npm run dev
    ```
 
-3. **Open in browser**
+4. **Open in browser**
    - Navigate to `http://localhost:3000`
    - Test the mock authentication flow
 
@@ -175,6 +181,33 @@ const {
   refresh,       // Mock session refresh
 } = useAuth();
 ```
+
+## 🔧 Environment Configuration
+
+### .env File Setup
+
+The project includes a `.env.example` file with all necessary environment variables for Clerk integration:
+
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Required: Clerk publishable key (get from https://dashboard.clerk.com/)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
+
+# Optional: Custom URLs and domains
+VITE_CLERK_DOMAIN=your-custom-domain.clerk.accounts.dev
+VITE_CLERK_SIGN_IN_URL=/login
+VITE_CLERK_SIGN_UP_URL=/signup
+VITE_CLERK_AFTER_SIGN_IN_URL=/profile
+VITE_CLERK_AFTER_SIGN_UP_URL=/profile
+```
+
+**Important Notes:**
+- Use `VITE_` prefix for environment variables (Vite requirement)
+- Never commit `.env` files (they're in `.gitignore`)
+- Restart dev server after changing environment variables
+- Use `pk_test_` keys for development, `pk_live_` for production
 
 ## 📚 Next Steps
 

@@ -54,7 +54,10 @@
                   Welcome, {{ user?.firstName || "User" }}!
                 </h2>
                 <p class="user-email">
-                  {{ user?.email }}
+                  {{
+                    user?.emailAddresses[0]?.emailAddress ||
+                    "Email not provided"
+                  }}
                 </p>
 
                 <div class="user-info">
@@ -64,7 +67,9 @@
                   </p>
                   <p>
                     <strong>Email:</strong>
-                    {{ user?.email || "Not provided" }}
+                    {{
+                      user?.emailAddresses[0]?.emailAddress || "Not provided"
+                    }}
                   </p>
                   <p>
                     <strong>User ID:</strong> {{ user?.id || "Not available" }}
@@ -105,7 +110,7 @@ import { useAuth } from "../composables/useAuth";
 import AuthActions from "../components/AuthActions.vue";
 
 const router = useRouter();
-const { user, signOut } = useAuth();
+const { user,  signOut } = useAuth();
 
 /**
  * Handle user sign out
