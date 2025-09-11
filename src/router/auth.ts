@@ -16,7 +16,11 @@ import LoginView from "../views/LoginView.vue";
 import SignUpView from "../views/SignUpView.vue";
 import ProfileView from "../views/ProfileView.vue";
 
-const routes = [
+/**
+ * Application routes configuration
+ * @type {Array<import('vue-router').RouteRecordRaw>}
+ */
+const routes: import("vue-router").RouteRecordRaw[] = [
   {
     path: "/",
     redirect: "/login",

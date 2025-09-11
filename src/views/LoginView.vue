@@ -112,9 +112,13 @@ const router = useRouter();
 const { signIn } = useAuth();
 
 // Form state
+/** @type {import('vue').Ref<string>} User's email input */
 const email = ref("");
+/** @type {import('vue').Ref<string>} User's password input */
 const password = ref("");
+/** @type {import('vue').Ref<boolean>} Whether the form is currently submitting */
 const isLoading = ref(false);
+/** @type {import('vue').Ref<string>} Current error message to display */
 const error = ref("");
 
 /**

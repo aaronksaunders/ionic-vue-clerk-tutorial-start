@@ -1,3 +1,21 @@
+<!--
+  @fileoverview App Content Component - Router and Authentication Handler
+  
+  This component handles the main application routing and authentication-based
+  navigation. It waits for Clerk to load before rendering and manages route
+  protection based on authentication state.
+  
+  Features:
+  - Suspense-compatible async loading
+  - Authentication-based route protection
+  - Guest route handling
+  - Verification state management
+  
+  @author Aaron Saunders
+  @version 1.0.0
+  @since 2024
+-->
+
 <template>
   <ion-router-outlet />
 </template>
@@ -13,16 +31,18 @@ const route = useRoute();
 const { isSignedIn, isLoaded } = useAuth();
 
 /**
- * Wait for Clerk to be fully loaded before rendering
- * This makes the component truly async for Suspense
+ * Wait for Clerk to be fully loaded before rendering.
+ * This makes the component truly async for Suspense.
+ * @async
+ * @returns {Promise<void>} Resolves when Clerk is loaded
  */
-await new Promise((resolve) => {
+await new Promise<void>((resolve) => {
   const unwatch = watch(
     isLoaded,
-    (loaded) => {
+    (loaded: boolean) => {
       if (loaded) {
         unwatch(); // Stop watching
-        resolve(undefined);
+        resolve();
       }
     },
     { immediate: true }
@@ -30,14 +50,19 @@ await new Promise((resolve) => {
 });
 
 /**
- * Handle authentication-based navigation
- * This runs after Clerk is loaded
+ * Handle authentication-based navigation.
+ * This runs after Clerk is loaded and manages route protection.
+ * @param {[boolean, import('vue-router').RouteLocationNormalizedLoaded]} params - Array containing signed in state and current route
  */
 watch(
   [isSignedIn, route],
-  ([signedIn, currentRoute]) => {
-    // Define protected routes
+  ([signedIn, currentRoute]: [
+    boolean,
+    import("vue-router").RouteLocationNormalizedLoaded
+  ]) => {
+    // Define protected routes that require authentication
     const protectedRoutes = ["/profile"];
+    // Define guest routes that should redirect if user is signed in
     const guestRoutes = ["/login", "/signup"];
 
     // Check if route requires authentication

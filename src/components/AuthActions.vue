@@ -76,6 +76,7 @@ import { ref } from "vue";
 import { useAuth } from "../composables/useAuth";
 
 const { isSignedIn, getUserProfile, getSession, refreshSession } = useAuth();
+/** @type {import('vue').Ref<string>} Stores the result of the last action performed */
 const actionResult = ref("");
 
 /**

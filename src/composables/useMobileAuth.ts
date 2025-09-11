@@ -25,9 +25,14 @@ export function useMobileAuth() {
 
   /**
    * Returns basic mobile profile information.
-   * @returns {{ platform: string, isMobile: boolean, isOnline: boolean, message: string }}
+   * @returns {{ platform: string, isMobile: boolean, isOnline: boolean, message: string }} Mobile profile object
    */
-  const getMobileProfile = () => {
+  const getMobileProfile = (): {
+    platform: string;
+    isMobile: boolean;
+    isOnline: boolean;
+    message: string;
+  } => {
     return {
       platform: "web",
       isMobile: isMobile.value,

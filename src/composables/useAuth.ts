@@ -47,7 +47,11 @@ export function useAuth() {
   const error = ref("");
 
   /**
-   * Sign in - always fails for demo purposes
+   * Signs in a user with email and password credentials.
+   * @async
+   * @param {string} email - User's email address
+   * @param {string} password - User's password
+   * @returns {Promise<boolean>} True if sign in was successful, false otherwise
    */
   const signIn = async (email: string, password: string): Promise<boolean> => {
     isLoading.value = true;
@@ -65,8 +69,10 @@ export function useAuth() {
         error.value = "Sign in failed";
         return false;
       }
-    } catch (err: any) {
-      error.value = err.message || "Sign in failed";
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Sign in failed";
+      error.value = errorMessage;
       console.error("Sign in error:", err);
       return false;
     } finally {
@@ -75,7 +81,13 @@ export function useAuth() {
   };
 
   /**
-   * Sign up - always fails for demo purposes
+   * Signs up a new user with email, password, and name information.
+   * @async
+   * @param {string} email - User's email address
+   * @param {string} password - User's password
+   * @param {string} firstName - User's first name
+   * @param {string} lastName - User's last name
+   * @returns {Promise<boolean>} True if sign up was successful, false otherwise
    */
   const signUp = async (
     email: string,
@@ -109,8 +121,10 @@ export function useAuth() {
         error.value = "Sign up failed";
         return false;
       }
-    } catch (err: any) {
-      error.value = err.message || "Sign up failed";
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Sign up failed";
+      error.value = errorMessage;
       console.error("Sign up error:", err);
       return false;
     } finally {
@@ -119,14 +133,16 @@ export function useAuth() {
   };
 
   /**
-   * Sign out - resets state
+   * Signs out the current user and clears the session.
+   * @async
+   * @returns {Promise<boolean>} True if sign out was successful, false otherwise
    */
-  const signOut = async (): Promise<Boolean> => {
+  const signOut = async (): Promise<boolean> => {
     isLoading.value = true;
     try {
       await clerk.value?.signOut();
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Sign out error:", err);
       return false;
     } finally {
@@ -134,7 +150,12 @@ export function useAuth() {
     }
   };
 
-  const handleGetUserProfile = async () => {
+  /**
+   * Retrieves the current user profile information.
+   * @async
+   * @returns {Promise<User | null>} The user profile object or null if not signed in
+   */
+  const handleGetUserProfile = async (): Promise<User | null> => {
     if (user.value) {
       console.log("User Profile:", user.value);
       return user.value;
@@ -144,7 +165,12 @@ export function useAuth() {
     }
   };
 
-  const handleGetSessionInfo = async () => {
+  /**
+   * Retrieves the current session information.
+   * @async
+   * @returns {Promise<any | null>} The session object or null if not signed in
+   */
+  const handleGetSessionInfo = async (): Promise<any | null> => {
     if (isSignedIn.value) {
       const session = await clerk.value?.session;
       console.log("Session Info:", session);
@@ -155,13 +181,18 @@ export function useAuth() {
     }
   };
 
-  const handleRefreshSession = async () => {
+  /**
+   * Refreshes the current user session.
+   * @async
+   * @returns {Promise<boolean>} True if refresh was successful, false otherwise
+   */
+  const handleRefreshSession = async (): Promise<boolean> => {
     if (isSignedIn.value) {
       try {
         await clerk.value?.session?.reload();
         console.log("Session refreshed");
         return true;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error refreshing session:", err);
         return false;
       }
@@ -171,6 +202,12 @@ export function useAuth() {
     }
   };
 
+  /**
+   * Handles email verification with the provided code.
+   * @async
+   * @param {string} code - The verification code from email
+   * @returns {Promise<boolean>} True if verification was successful, false otherwise
+   */
   const handleVerification = async (code: string): Promise<boolean> => {
     isLoading.value = true;
     error.value = "";
@@ -198,7 +235,7 @@ export function useAuth() {
           console.log("Email verification failed");
           return false;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error during email verification:", err);
         return false;
       }
@@ -210,10 +247,15 @@ export function useAuth() {
 
   return {
     // State
+    /** @type {import('vue').ComputedRef<boolean>} Whether the user is currently signed in */
     isSignedIn: computed(() => isSignedIn.value),
+    /** @type {import('vue').ComputedRef<User | null>} Current user object or null if not signed in */
     user: computed(() => user.value),
+    /** @type {import('vue').ComputedRef<boolean>} Whether Clerk has finished loading */
     isLoaded: computed(() => isLoaded.value),
+    /** @type {import('vue').ComputedRef<boolean>} Whether an authentication operation is in progress */
     isLoading: computed(() => isLoading.value),
+    /** @type {import('vue').ComputedRef<string>} Current error message, empty string if no error */
     error: computed(() => error.value),
 
     // Methods

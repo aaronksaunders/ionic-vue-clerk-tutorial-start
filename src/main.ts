@@ -28,7 +28,10 @@ import {
   checkmark,
 } from "ionicons/icons";
 
-// Register all icons used in the app
+/**
+ * Register all icons used in the app with Ionicons.
+ * This makes the icons available throughout the application.
+ */
 addIcons({
   "log-in-outline": logInOutline,
   "person-add-outline": personAddOutline,
@@ -61,12 +64,20 @@ import "@ionic/vue/css/flex-utils.css";
 import "./theme/variables.css";
 import { clerkPlugin } from "@clerk/vue";
 
+/**
+ * Clerk publishable key from environment variables
+ * @type {string}
+ */
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 }
 
+/**
+ * Create and configure the Vue application with all necessary plugins.
+ * @type {import('vue').App}
+ */
 const app = createApp(App)
   .use(IonicVue, {
     mode: "ios",
@@ -76,7 +87,10 @@ const app = createApp(App)
     publishableKey: PUBLISHABLE_KEY,
   });
 
-// Wait for router to be ready before mounting
+/**
+ * Wait for router to be ready before mounting the application.
+ * This ensures all routes are properly initialized before the app starts.
+ */
 router.isReady().then(() => {
   app.mount("#app");
 });

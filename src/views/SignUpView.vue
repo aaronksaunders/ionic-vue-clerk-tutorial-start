@@ -177,16 +177,25 @@ const router = useRouter();
 const { signUp, handleVerification, error } = useAuth();
 
 // Form state
+/** @type {import('vue').Ref<string>} User's email input */
 const email = ref("");
+/** @type {import('vue').Ref<string>} User's password input */
 const password = ref("");
+/** @type {import('vue').Ref<string>} Password confirmation input */
 const confirmPassword = ref("");
+/** @type {import('vue').Ref<string>} User's first name input */
 const firstName = ref("");
+/** @type {import('vue').Ref<string>} User's last name input */
 const lastName = ref("");
+/** @type {import('vue').Ref<boolean>} Whether the form is currently submitting */
 const isLoading = ref(false);
+/** @type {import('vue').Ref<string>} Local error message for this component */
 const localError = ref("");
+/** @type {import('vue').Ref<boolean>} Whether email verification is needed */
 const needsVerification = ref(
   localStorage.getItem("needsVerification") === "true"
 );
+/** @type {import('vue').Ref<string>} Email verification code input */
 const verificationCode = ref("");
 
 /**
