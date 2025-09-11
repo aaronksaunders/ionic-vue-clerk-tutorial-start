@@ -1,0 +1,7 @@
+{
+  "name": "clerk-ionic-app-template",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}

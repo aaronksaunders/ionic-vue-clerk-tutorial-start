@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow cleartext traffic for Clerk domains -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">clerk.accounts.dev</domain>
+        <domain includeSubdomains="true">clerk.com</domain>
+        <domain includeSubdomains="true">api.clerk.com</domain>
+        <domain includeSubdomains="true">clerk.dev</domain>
+    </domain-config>
+    
+    <!-- For development only - allows cleartext traffic -->
+    <!-- Remove this base-config for production builds -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>
