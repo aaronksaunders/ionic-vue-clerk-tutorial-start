@@ -24,7 +24,8 @@ export function useMobileAuth() {
   const isAppActive = ref(true);
 
   /**
-   * Mobile profile - returns basic user info
+   * Returns basic mobile profile information.
+   * @returns {{ platform: string, isMobile: boolean, isOnline: boolean, message: string }}
    */
   const getMobileProfile = () => {
     return {
@@ -36,7 +37,9 @@ export function useMobileAuth() {
   };
 
   /**
-   * Refresh - does nothing
+   * Refreshes mobile authentication state (mock implementation).
+   * @async
+   * @returns {Promise<void>} Resolves when refresh is complete
    */
   const refreshAuthState = async () => {
     console.log(
@@ -45,12 +48,22 @@ export function useMobileAuth() {
   };
 
   return {
-    // State
+    /**
+     * Indicates if running on mobile device
+     * @type {import('vue').ComputedRef<boolean>}
+     */
     isMobile: computed(() => isMobile.value),
+    /**
+     * Indicates if device is online
+     * @type {import('vue').ComputedRef<boolean>}
+     */
     isOnline: computed(() => isOnline.value),
+    /**
+     * Indicates if app is active
+     * @type {import('vue').ComputedRef<boolean>}
+     */
     isAppActive: computed(() => isAppActive.value),
 
-    // Methods
     getMobileProfile,
     refreshAuthState,
   };

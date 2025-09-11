@@ -17,26 +17,43 @@
         <ion-card-subtitle>Authentication actions</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
-        <ion-button expand="block" disabled color="tertiary">
-          <ion-icon name="person" slot="start"></ion-icon>
+        <ion-button
+          expand="block"
+          @click="handleGetUserProfile"
+          :disabled="!isSignedIn"
+          color="tertiary"
+        >
+          <ion-icon name="person-outline" slot="start"></ion-icon>
           Get User Profile
         </ion-button>
 
-        <ion-button expand="block" disabled color="medium">
+        <ion-button
+          expand="block"
+          :disabled="!isSignedIn"
+          color="medium"
+          @click="handleGetSessionInfo"
+        >
           <ion-icon name="mail-outline" slot="start"></ion-icon>
           Get Session Info
         </ion-button>
 
-        <ion-button expand="block" disabled color="secondary">
+        <ion-button
+          expand="block"
+          color="secondary"
+          :disabled="!isSignedIn"
+          @click="handleRefreshSession"
+        >
           <ion-icon name="refresh-outline" slot="start"></ion-icon>
           Refresh Session
         </ion-button>
 
         <ion-item>
-          <ion-label>
-            <h3>Status</h3>
-            <p>Authentication - will be enhanced with Clerk integration</p>
-          </ion-label>
+          <ion-item v-if="actionResult">
+            <ion-label>
+              <h3>Result</h3>
+              <pre>{{ actionResult }}</pre>
+            </ion-label>
+          </ion-item>
         </ion-item>
       </ion-card-content>
     </ion-card>
@@ -55,6 +72,54 @@ import {
   IonItem,
   IonLabel,
 } from "@ionic/vue";
+import { ref } from "vue";
+import { useAuth } from "../composables/useAuth";
 
-// Simple template - authentication actions will be added during tutorial
+const { isSignedIn, getUserProfile, getSession, refreshSession } = useAuth();
+const actionResult = ref("");
+
+/**
+ * Handles fetching and displaying the user profile.
+ * @async
+ * @returns {Promise<void>}
+ */
+const handleGetUserProfile = async () => {
+  if (isSignedIn.value) {
+    const profile = await getUserProfile();
+    actionResult.value = JSON.stringify(profile, null, 2);
+    console.log("User Profile:", profile);
+  } else {
+    console.log("User is not signed in.");
+  }
+};
+
+/**
+ * Handles fetching and displaying the session info.
+ * @async
+ * @returns {Promise<void>}
+ */
+const handleGetSessionInfo = async () => {
+  if (isSignedIn.value) {
+    const session = await getSession();
+    actionResult.value = JSON.stringify(session, null, 2);
+    console.log("Session Info:", session);
+  } else {
+    console.log("User is not signed in.");
+  }
+};
+/**
+ * Handles refreshing the user session and displays result.
+ * @async
+ * @returns {Promise<void>}
+ */
+const handleRefreshSession = async () => {
+  if (isSignedIn.value) {
+    const success = await refreshSession();
+    actionResult.value = success
+      ? "Session refreshed"
+      : "Failed to refresh session";
+  } else {
+    console.log("User is not signed in.");
+  }
+};
 </script>

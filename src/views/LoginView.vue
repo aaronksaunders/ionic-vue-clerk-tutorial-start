@@ -109,7 +109,7 @@ import {
 import { useAuth } from "../composables/useAuth";
 
 const router = useRouter();
-const { handleSignIn: signIn } = useAuth();
+const { signIn } = useAuth();
 
 // Form state
 const email = ref("");
@@ -118,7 +118,10 @@ const isLoading = ref(false);
 const error = ref("");
 
 /**
- * Handle sign in form submission
+ * Handles sign in form submission.
+ * Validates input, calls signIn, and navigates on success.
+ * @async
+ * @returns {Promise<void>}
  */
 const handleSignIn = async () => {
   if (!email.value || !password.value) {
@@ -130,13 +133,19 @@ const handleSignIn = async () => {
     isLoading.value = true;
     error.value = "";
 
-    await signIn(email.value, password.value);
+    const result = await signIn(email.value, password.value);
 
-    // Clear form
-    email.value = "";
-    password.value = "";
-    // Navigate to profile
-    router.push("/profile");
+    if (result) {
+      // Clear form
+      email.value = "";
+      password.value = "";
+      // Navigate to profile
+      router.push("/profile");
+    } else {
+      error.value = "Invalid email or password";
+      email.value = "";
+      password.value = "";
+    }
   } catch (err) {
     error.value = err instanceof Error ? err.message : "Sign in failed";
   } finally {
@@ -145,7 +154,7 @@ const handleSignIn = async () => {
 };
 
 /**
- * Navigate to sign up view
+ * Navigates to the sign up view.
  */
 const navigateToSignUp = () => {
   router.push("/signup");

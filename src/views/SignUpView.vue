@@ -23,6 +23,9 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
+      <!-- Add this div for CAPTCHA -->
+      <div id="clerk-captcha"></div>
+
       <div class="container">
         <!-- Sign Up Form -->
         <ion-card>
@@ -109,10 +112,36 @@
               </ion-button>
             </div>
 
+            <!-- needsVerification Display -->
+            <div v-if="needsVerification" class="ion-padding">
+              <ion-item>
+                <ion-label position="stacked">Verification Code</ion-label>
+                <ion-input
+                  v-model="verificationCode"
+                  type="text"
+                  placeholder="Enter code from email"
+                  :disabled="isLoading"
+                ></ion-input>
+              </ion-item>
+              <ion-button
+                @click="handleVerify"
+                expand="block"
+                :disabled="isLoading || !verificationCode"
+              >
+                <ion-spinner v-if="isLoading" name="crescent"></ion-spinner>
+                <ion-icon
+                  v-else
+                  name="checkmark-outline"
+                  slot="start"
+                ></ion-icon>
+                Verify Account
+              </ion-button>
+            </div>
+
             <!-- Error Display -->
-            <ion-item v-if="error" color="danger">
+            <ion-item v-if="localError" color="danger">
               <ion-icon name="warning" slot="start"></ion-icon>
-              <ion-label>{{ error }}</ion-label>
+              <ion-label>{{ localError }}</ion-label>
             </ion-item>
           </ion-card-content>
         </ion-card>
@@ -145,7 +174,7 @@ import {
 import { useAuth } from "../composables/useAuth";
 
 const router = useRouter();
-const { handleSignUp:signUp } = useAuth();
+const { signUp, handleVerification, error } = useAuth();
 
 // Form state
 const email = ref("");
@@ -154,45 +183,113 @@ const confirmPassword = ref("");
 const firstName = ref("");
 const lastName = ref("");
 const isLoading = ref(false);
-const error = ref("");
+const localError = ref("");
+const needsVerification = ref(
+  localStorage.getItem("needsVerification") === "true"
+);
+const verificationCode = ref("");
 
 /**
- * Handle sign up form submission
+ * Handles sign up form submission.
+ * Validates input, calls signUp, and navigates on success.
+ * @async
+ * @returns {Promise<void>}
  */
 const handleSignUp = async () => {
   if (!email.value || !password.value || !firstName.value || !lastName.value) {
-    error.value = "Please fill in all fields";
+    localError.value = "Please fill in all fields";
     return;
   }
 
   if (password.value !== confirmPassword.value) {
-    error.value = "Passwords do not match";
+    localError.value = "Passwords do not match";
     return;
   }
 
   try {
     isLoading.value = true;
-    error.value = "";
+    localError.value = "";
 
-    await signUp(email.value, password.value, firstName.value, lastName.value);
+    const result = await signUp(
+      email.value,
+      password.value,
+      firstName.value,
+      lastName.value
+    );
+    if (result) {
+      clearForm();
+      needsVerification.value = false;
+      localStorage.setItem("needsVerification", "false");
 
-    // Clear form
-    email.value = "";
-    password.value = "";
-    confirmPassword.value = "";
-    firstName.value = "";
-    lastName.value = "";
-    // Navigate to profile
-    router.push("/profile");
+      // Navigate to profile
+      router.push("/profile");
+    } else {
+      console.error("Sign up failed:", error.value);
+      if (
+        error.value?.includes("verification") ||
+        error.value?.includes("Email verification required") ||
+        error.value?.includes("missing_requirements") ||
+        error.value?.includes("CAPTCHA")
+      ) {
+        needsVerification.value = true;
+        localStorage.setItem("needsVerification", "true");
+      }
+    }
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "Sign up failed";
+    localError.value = err instanceof Error ? err.message : "Sign up failed";
   } finally {
     isLoading.value = false;
   }
 };
 
 /**
- * Navigate to login view
+ * Handles verification code submission.
+ * Calls handleVerification and navigates on success.
+ * @async
+ * @returns {Promise<void>}
+ */
+const handleVerify = async () => {
+  if (!verificationCode.value) {
+    localError.value = "Please enter the verification code";
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+    localError.value = "";
+
+    const result = await handleVerification(verificationCode.value);
+    if (result) {
+      needsVerification.value = false;
+      localStorage.setItem("needsVerification", "false");
+      clearForm();
+      router.push("/profile");
+    }
+  } catch (err) {
+    localError.value =
+      err instanceof Error ? err.message : "Verification failed";
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+/**
+ * Clears all form fields and resets local state.
+ */
+const clearForm = () => {
+  email.value = "";
+  password.value = "";
+  confirmPassword.value = "";
+  firstName.value = "";
+  lastName.value = "";
+  localError.value = "";
+  localStorage.setItem("needsVerification", "false");
+  verificationCode.value = "";
+  needsVerification.value = false;
+};
+
+/**
+ * Navigates to the login view.
  */
 const navigateToLogin = () => {
   router.push("/login");

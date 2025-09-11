@@ -10,7 +10,8 @@
  */
 
 import { ref, computed } from "vue";
-
+import { useClerk, useUser } from "@clerk/vue";
+import { toastController } from "@ionic/vue";
 /**
  * User interface
  */
@@ -38,20 +39,39 @@ const error = ref("");
  * All methods are templates and will be replaced during the tutorial.
  */
 export function useAuth() {
+  const clerk = useClerk();
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  // Internal state
+  const isLoading = ref(false);
+  const error = ref("");
+
   /**
    * Sign in - always fails for demo purposes
    */
   const signIn = async (email: string, password: string): Promise<boolean> => {
     isLoading.value = true;
     error.value = "";
+    try {
+      const result = await clerk.value?.client?.signIn.create({
+        identifier: email,
+        password: password,
+      });
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Always fail to encourage using real Clerk
-    error.value = "Authentication - please integrate Clerk to enable sign in";
-    isLoading.value = false;
-    return false;
+      if (result?.status === "complete") {
+        await clerk.value?.setActive({ session: result.createdSessionId });
+        return true;
+      } else {
+        error.value = "Sign in failed";
+        return false;
+      }
+    } catch (err: any) {
+      error.value = err.message || "Sign in failed";
+      console.error("Sign in error:", err);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   };
 
   /**
@@ -66,29 +86,126 @@ export function useAuth() {
     isLoading.value = true;
     error.value = "";
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const result = await clerk.value?.client?.signUp.create({
+        emailAddress: email,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+      });
 
-    // Always fail to encourage using real Clerk
-    error.value = "Authentication - please integrate Clerk to enable sign up";
-    isLoading.value = false;
-    return false;
+      console.log("Sign up result:", result);
+      if (result?.status === "complete") {
+        await clerk.value?.setActive({ session: result.createdSessionId });
+        return true;
+      } else if (result?.status === "missing_requirements") {
+        await result.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
+
+        error.value = "Email verification required";
+        return false;
+      } else {
+        error.value = "Sign up failed";
+        return false;
+      }
+    } catch (err: any) {
+      error.value = err.message || "Sign up failed";
+      console.error("Sign up error:", err);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   };
 
   /**
    * Sign out - resets state
    */
-  const signOut = async (): Promise<void> => {
+  const signOut = async (): Promise<Boolean> => {
     isLoading.value = true;
+    try {
+      await clerk.value?.signOut();
+      return true;
+    } catch (err: any) {
+      console.error("Sign out error:", err);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  };
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  const handleGetUserProfile = async () => {
+    if (user.value) {
+      console.log("User Profile:", user.value);
+      return user.value;
+    } else {
+      console.log("User is not signed in.");
+      return null;
+    }
+  };
 
-    // Reset state
-    isSignedIn.value = false;
-    user.value = null;
+  const handleGetSessionInfo = async () => {
+    if (isSignedIn.value) {
+      const session = await clerk.value?.session;
+      console.log("Session Info:", session);
+      return session;
+    } else {
+      console.log("User is not signed in.");
+      return null;
+    }
+  };
+
+  const handleRefreshSession = async () => {
+    if (isSignedIn.value) {
+      try {
+        await clerk.value?.session?.reload();
+        console.log("Session refreshed");
+        return true;
+      } catch (err: any) {
+        console.error("Error refreshing session:", err);
+        return false;
+      }
+    } else {
+      console.log("User is not signed in.");
+      return false;
+    }
+  };
+
+  const handleVerification = async (code: string): Promise<boolean> => {
+    isLoading.value = true;
     error.value = "";
-    isLoading.value = false;
+
+    if (clerk.value) {
+      try {
+        const signUpAttempt = clerk.value?.client?.signUp;
+        if (!signUpAttempt) {
+          throw new Error("No sign-up attempt found");
+        }
+
+        // Assuming the user has a pending email address verification
+        const verification =
+          await signUpAttempt.attemptEmailAddressVerification({
+            code: code,
+          });
+
+        if (verification?.status === "complete") {
+          await clerk.value?.setActive({
+            session: verification.createdSessionId,
+          });
+          console.log("Email verified successfully");
+          return true;
+        } else {
+          console.log("Email verification failed");
+          return false;
+        }
+      } catch (err: any) {
+        console.error("Error during email verification:", err);
+        return false;
+      }
+    } else {
+      console.log("Clerk is not initialized.");
+      return false;
+    }
   };
 
   return {
@@ -103,5 +220,9 @@ export function useAuth() {
     signIn,
     signUp,
     signOut,
+    getUserProfile: handleGetUserProfile,
+    getSession: handleGetSessionInfo,
+    refreshSession: handleRefreshSession,
+    handleVerification,
   };
 }

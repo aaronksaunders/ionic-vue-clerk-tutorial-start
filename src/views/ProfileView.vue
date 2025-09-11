@@ -110,10 +110,12 @@ import { useAuth } from "../composables/useAuth";
 import AuthActions from "../components/AuthActions.vue";
 
 const router = useRouter();
-const { user,  signOut } = useAuth();
+const { user, signOut } = useAuth();
 
 /**
- * Handle user sign out
+ * Handles user sign out and navigates to login view.
+ * @async
+ * @returns {Promise<void>}
  */
 const handleSignOut = async () => {
   await signOut();
@@ -121,7 +123,9 @@ const handleSignOut = async () => {
 };
 
 /**
- * Format date for display
+ * Formats a date for display in the profile view.
+ * @param {Date | null | undefined} date - The date to format
+ * @returns {string} Formatted date string
  */
 const formatDate = (date: Date | null | undefined) => {
   if (!date) return "Not available";

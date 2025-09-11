@@ -35,9 +35,10 @@ addIcons({
   "log-out-outline": logOutOutline,
   "refresh-outline": refreshOutline,
   "mail-outline": mailOutline,
-  person: personOutline,
-  warning: warning,
-  checkmark: checkmark,
+  "check-mark-outline": checkmark,
+  "person-outline": personOutline,
+  "warning-outline": warning,
+  "checkmark-outline": checkmark,
 });
 
 /* Core CSS required for Ionic components to work properly */

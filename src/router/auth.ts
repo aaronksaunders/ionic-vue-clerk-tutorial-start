@@ -38,6 +38,11 @@ const routes = [
   },
 ];
 
+/**
+ * Creates and exports the main router for authentication views.
+ *
+ * @type {import('vue-router').Router}
+ */
 const router = createRouter({
   history: createWebHistory(),
   routes,
