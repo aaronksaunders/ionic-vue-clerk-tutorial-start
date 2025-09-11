@@ -11,12 +11,27 @@
 
 <template>
   <ion-app>
-    <ion-router-outlet />
+    <Suspense>
+      <!-- Main Content -->
+      <template #default>
+        <AppContent />
+      </template>
+
+      <!-- Fallback Content -->
+      <template #fallback>
+        <LoadingSpinner />
+      </template>
+    </Suspense>
   </ion-app>
 </template>
 
 <script setup lang="ts">
-import { IonApp, IonRouterOutlet } from "@ionic/vue";
+import { IonApp } from "@ionic/vue";
+import { defineAsyncComponent } from "vue";
+import LoadingSpinner from "./components/LoadingSpinner.vue";
 
-// Simple app structure - authentication logic will be added during tutorial
+// Define the main app content as an async component
+const AppContent = defineAsyncComponent(
+  () => import("@/components/AppContent.vue")
+);
 </script>

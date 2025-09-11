@@ -27,7 +27,7 @@ interface User {
  * Authentication state
  */
 const isLoading = ref(false);
-const isLoaded = ref(true);
+// const isLoaded = ref(true);
 const isSignedIn = ref(false);
 const user = ref<User | null>(null);
 const error = ref("");
