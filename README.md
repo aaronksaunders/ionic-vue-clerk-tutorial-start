@@ -1,5 +1,7 @@
 # Ionic Vue Clerk Tutorial - Starting Point
 
+[See Video Here](https://youtu.be/EBGPINHP_xs)
+
 A clean Ionic Vue application designed as a **tutorial starting point** for learning how to integrate Clerk authentication. This app provides a basic foundation with mock authentication that you'll replace with real Clerk functionality during the tutorial.
 
 > **🚀 Quick Start**: This is the `main` branch - the tutorial starting point. For the completed implementation with real Clerk integration, check out the `finished-code` branch.
