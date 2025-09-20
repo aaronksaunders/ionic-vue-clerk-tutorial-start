@@ -458,11 +458,14 @@ src/
 
 This project is licensed under the MIT License.
 
-## 👨‍💻 Author
+## Author
 
-**Aaron Saunders**
-- GitHub: [@aaronksaunders](https://github.com/aaronksaunders)
-- Email: aaron@clearlyinnovative.com
+Created by Aaron K. Saunders
+
+- 🎥 [YouTube Channel](https://www.youtube.com/channel/UCMCcqbJpyL3LAv3PJeYz2bg/)
+- 🐦 [Twitter](https://x.com/aaronksaunders)
+- 💼 [LinkedIn](https://www.linkedin.com/in/aaronksaunders/)
+- 🌐 [GitHub](https://github.com/aaronksaunders)
 
 ## 🙏 Acknowledgments
 
